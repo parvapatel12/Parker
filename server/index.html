@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1 id="main"></h1>
+        <script>
+            const main = document.getElementById("main");
+            const a = 4;
+            let b = 0;
+            function change() {
+                b = (b + 1) % a;
+                let str = ".".repeat(b);
+                main.innerHTML = "ParkChamp: The Server is up and running" + str;
+            }
+            setInterval(change, 500);
+        </script>
+    </body>
+</html>
