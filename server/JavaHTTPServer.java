@@ -10,10 +10,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class JavaHTTPServer implements Runnable{
 
@@ -29,6 +26,8 @@ public class JavaHTTPServer implements Runnable{
 
     static final List<QRRequest> requests = new ArrayList<QRRequest>();
     static Boolean flag = false;
+
+    static Parking parking = new Parking();
 
     // Client Connection via Socket Class\
     private Socket connect;
@@ -91,9 +90,7 @@ public class JavaHTTPServer implements Runnable{
             // get first line of the request from the client
             String input = in.readLine();
             // we parse the request with a string tokenizer
-            System.out.println("**********************");
             System.out.println(input);
-            System.out.println("**********************");
             StringTokenizer parse = new StringTokenizer(input);
             String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
             // we get file requested
@@ -137,7 +134,7 @@ public class JavaHTTPServer implements Runnable{
                     flag = true;
                     new Thread(() -> {
                         try {
-                            Thread.sleep(10000);
+                            Thread.sleep(1000);
                             flag = false;
                         }
                         catch (Exception e){
@@ -163,6 +160,7 @@ public class JavaHTTPServer implements Runnable{
                         }
                         if (output == "valid") {
                             validationOutput = "userEnter.txt";
+                            System.out.println(parking.getNearestSpot());
                             flag = false;
                         } else {
                             validationOutput = "userCantEnter.txt";
@@ -192,7 +190,7 @@ public class JavaHTTPServer implements Runnable{
                     flag = true;
                     new Thread(() -> {
                         try {
-                            Thread.sleep(10000);
+                            Thread.sleep(1000);
                             flag = false;
                         }
                         catch (Exception e){
@@ -239,7 +237,46 @@ public class JavaHTTPServer implements Runnable{
                     dataOut.write(fileData, 0, fileLength);
                     dataOut.flush();
                 }
+                else if (params.contains("/getparking")) {
+                    var parkingString = "";
+                    for (int i=0; i<parking.parkingGuide.length; i++) {
+                        parkingString = parkingString + String.join("-", parking.parkingGuide[i]) + "+";
+                    }
 
+                    out.println("HTTP/1.1 200 OK");
+                    out.println("Server: Java HTTP Server from Parva : 1.0");
+                    out.println("Date: " + new Date());
+                    out.println("Content-type: text/plain");
+                    out.println("Content-length: " + parkingString.length());
+                    out.println();
+                    out.flush();
+
+                    dataOut.write(parkingString.getBytes());
+                    dataOut.flush();
+                }
+                else if (params.contains("/setparking?")) {
+                    String[] values = params.replace("/setparking?", "").split("&");
+
+                    String[] coordinates = values[0].replace("coordinates=", "").split("-");
+                    int x = Integer.parseInt(coordinates[0]);
+                    int y = Integer.parseInt(coordinates[1]);
+
+                    String parkingStatus = values[1].replace("status=", "");
+
+                    parking.parkingGuide[x][y] = parkingStatus;
+
+                    String response = "Parking updated.";
+                    out.println("HTTP/1.1 200 OK");
+                    out.println("Server: Java HTTP Server from Parva : 1.0");
+                    out.println("Date: " + new Date());
+                    out.println("Content-type: text/plain");
+                    out.println("Content-length: " + response.length());
+                    out.println();
+                    out.flush();
+
+                    dataOut.write(response.getBytes());
+                    dataOut.flush();
+                }
             }
         } catch (FileNotFoundException fnfe) {
             try {
@@ -327,5 +364,174 @@ class QRRequest {
 
     public static void main(String[] args) {
         System.out.println("New request created.");
+    }
+}
+
+public class Parking {
+    static int ROWS = 21;
+    static int COLUMNS = 30;
+
+    static String[][] parkingGuide =
+            {
+                    {"xx", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "xx"},
+                    {"ss", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "pn"},
+                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pn"},
+                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "se"},
+                    {"xx", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "xx"}
+            };
+    static boolean[][] pathVisited = new boolean[ROWS][COLUMNS];
+
+    static int[] xVal = new int[]{ 0, 1, 0, -1 };
+    static int[] yVal = new int[]{ 1, 0, -1, 0 };
+    static char[] dir = new char[]{ 'E', 'S', 'W', 'N' };
+
+    public static void Parking() {
+
+    }
+
+    public static String getPathDirections(String Dir) {
+        String path = "S";
+        int l = Dir.length();
+        int i = 0;
+        int j = 1;
+
+        while(j < l){
+            if(Dir.charAt(i) == 'E' && Dir.charAt(j) == 'E'){
+                path = path +'S';
+            }
+
+            if(Dir.charAt(i) == 'E' && Dir.charAt(j) == 'S'){
+                path = path +'R';
+            }
+
+            if(Dir.charAt(i) == 'E' && Dir.charAt(j) == 'N'){
+                path = path +'L';
+            }
+
+            if(Dir.charAt(i) == 'W' && Dir.charAt(j) == 'W'){
+                path = path +'S';
+            }
+
+            if(Dir.charAt(i) == 'W' && Dir.charAt(j) == 'S'){
+                path = path +'L';
+            }
+
+            if(Dir.charAt(i) == 'W' && Dir.charAt(j) == 'N'){
+                path = path +'R';
+            }
+
+            if(Dir.charAt(i) == 'S' && Dir.charAt(j) == 'S'){
+                path = path +'S';
+            }
+
+            if(Dir.charAt(i) == 'S' && Dir.charAt(j) == 'E'){
+                path = path +'L';
+            }
+
+            if(Dir.charAt(i) == 'S' && Dir.charAt(j) == 'W'){
+                path = path +'R';
+            }
+
+            if(Dir.charAt(i) == 'N' && Dir.charAt(j) == 'N'){
+                path = path +'S';
+            }
+
+            if(Dir.charAt(i) == 'N' && Dir.charAt(j) == 'E'){
+                path = path +'R';
+            }
+
+            if(Dir.charAt(i) == 'N' && Dir.charAt(j) == 'W'){
+                path = path +'L';
+            }
+            i++;
+            j++;
+        }
+
+        return path;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("New Parking created.");
+    }
+
+    public static String getNearestSpot() {
+        int row = 1, column = 1;
+        int[] pxVal = new int[2], pyVal = new int[2];
+        char[] pDir = new char[2];
+
+        Queue<Cell> q = new LinkedList<Cell>();
+        q.clear();
+        q.add(new Cell(row, column, ""));
+        pathVisited[row][column] = true;
+        boolean flag = true;
+
+        while (flag && !q.isEmpty()) {
+            Cell cell = q.peek();
+            int x = cell.first;
+            int y = cell.second;
+            String path = cell.path;
+            q.remove();
+            if (parkingGuide[x][y] == "rh") {
+                pxVal = new int[]{-1, 1};
+                pyVal = new int[]{0, 0};
+                pDir = new char[]{'N', 'S'};
+            } else if (parkingGuide[x][y] == "rv") {
+                pxVal = new int[]{0, 0};
+                pyVal = new int[]{-1, 1};
+                pDir = new char[]{'W', 'E'};
+            }
+
+            for(int i=0; i<pxVal.length; i++) {
+                int adjx = x + pxVal[i];
+                int adjy = y + pyVal[i];
+                if (parkingGuide[adjx][adjy].charAt(1) == 'a') {
+                    flag = false;
+                    pathVisited = new boolean[ROWS][COLUMNS];
+                    q.clear();
+//                    return path + pDir[i];
+                    System.out.println(path + pDir[i]);
+                    return getPathDirections("E" + path + pDir[i]);
+                }
+            }
+
+            for(int i=0; i<xVal.length; i++) {
+                int adjx = x + xVal[i];
+                int adjy = y + yVal[i];
+                if (!pathVisited[adjx][adjy] && parkingGuide[adjx][adjy].charAt(0) == 'r') {
+                    q.add(new Cell(adjx, adjy, path + dir[i]));
+                    pathVisited[adjx][adjy] = true;
+                }
+            }
+        }
+        pathVisited = new boolean[ROWS][COLUMNS];
+        q.clear();
+        return "No parking available";
+    }
+
+}
+
+class Cell {
+    int first, second;
+    String path = "";
+    public Cell (int first, int second, String path) {
+        this.first = first;
+        this.second = second;
+        this.path = path;
     }
 }
