@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "986663383213",
+    "project_id": "parker-cb825",
+    "storage_bucket": "parker-cb825.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986663383213:android:45609c9427475f70441624",
+        "android_client_info": {
+          "package_name": "com.nexus.parker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "986663383213-rk7k651len40pjpq8edgk1tjcvnptd2a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nexus.parker",
+            "certificate_hash": "af47beea84e430653e2e09b7e3a9cea2b4657468"
+          }
+        },
+        {
+          "client_id": "986663383213-44ftqlc8lnar2mgmqf4bcv4uq4m3okhr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG6c9jJafSGZkwBm6fYYx78q5q4nGY0Wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "986663383213-44ftqlc8lnar2mgmqf4bcv4uq4m3okhr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

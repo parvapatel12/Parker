@@ -26,6 +26,7 @@ public class JavaHTTPServer implements Runnable{
 
     static final List<QRRequest> requests = new ArrayList<QRRequest>();
     static Boolean flag = false;
+    static int hourlyRate = 4;
 
     static Parking parking = new Parking();
 
@@ -103,24 +104,27 @@ public class JavaHTTPServer implements Runnable{
 
                     System.out.println("No user specified. Nothing can be done.");
 
-                } else if (params.contains("/enter?id=")) { // Pass url/enter?id=7I1DZpCvHdLfNIa2fL91&validity=valid
+                } else if (params.contains("/entry?id=")) { // Pass url/enter?id=7I1DZpCvHdLfNIa2fL91&validity=valid
 
-                    String[] details = params.replace("/enter?", "").split("&");
-                    String ID = details[0].split("=")[1];
-                    String validity = details[1].split("=")[1];
+                    String ID = params.replace("/entry?id=", "");
+//                    String[] details = params.replace("/enter?", "").split("&");
+//                    String ID = details[0].split("=")[1];
+//                    String validity = details[1].split("=")[1];
+                    String validity = "valid";
                     String type = "entry";
-                    requests.add(new QRRequest(ID, validity, type));
+                    requests.add(new QRRequest(ID, validity, type, ""));
 
                 }  else if (params.contains("/exit?id=")) { // Pass url/exit?id=7I1DZpCvHdLfNIa2fL91
 
-                    String details = params.replace("/exit?", "");
-                    String ID = details.split("=")[1];
+                    String[] details = params.replace("/exit?", "").split("&");
+                    String ID = details[0].split("=")[1];
+                    String entryTime = details[1].split("=")[1];
                     String type = "exit";
-                    requests.add(new QRRequest(ID, "valid", type));
+                    requests.add(new QRRequest(ID, "valid", type, entryTime));
 
                 }
                 for (QRRequest r : requests) {
-                    System.out.println(r.ID + ", " + r.validity + ", " + r.type);
+                    System.out.println(r.ID + ", " + r.validity + ", " + r.type + ", " + r.entryTime);
                 }
 
             } else if (method.equals("GET")) {
@@ -128,13 +132,13 @@ public class JavaHTTPServer implements Runnable{
                 if (params.equals("/") || params.equals("/?")) {
                     System.out.println("No user specified. Nothing can be done.");
                 }
-                else if (params.contains("/checkentry?id=")) {
-                    String id = params.replace("/checkentry?id=", "");
+                else if (params.contains("/check?id=")) {
+                    String id = params.replace("/check?id=", "");
 
                     flag = true;
                     new Thread(() -> {
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(15000);
                             flag = false;
                         }
                         catch (Exception e){
@@ -142,9 +146,11 @@ public class JavaHTTPServer implements Runnable{
                         }
                     }).start();
 
-                    String validationOutput = "userCantEnter.txt";
+//                    String validationOutput = "userCantEnter.txt";
 
                     System.out.println("Entering while loop");
+                    QRRequest foundRequest = new QRRequest("", "", "", "");
+                    String response = "You can't go.";
                     while(flag) {
                         // Check for the user's in-time being entered in the database.
 
@@ -154,89 +160,104 @@ public class JavaHTTPServer implements Runnable{
                         Integer lengthOfRequests = requests.size();
                         for (int i=lengthOfRequests-1; (i>lengthOfRequests - checkCount) && (i>=0); i--) {
                             QRRequest request = requests.get(i);
-                            if (id.equals(request.ID) && request.type.equals("entry") && request.validity.equals("valid")) {
+                            if (id.equals(request.ID) && request.validity.equals("valid")) {
                                 output = "valid";
+                                foundRequest = request;
+                                requests.remove(i);
+                                break;
                             }
                         }
                         if (output == "valid") {
-                            validationOutput = "userEnter.txt";
-                            System.out.println(parking.getNearestSpot());
+                            if (foundRequest.type.equals("entry")) {
+                                response = "Enter-" + parking.getNearestSpot();
+                            } else if (foundRequest.type.equals("exit")) {
+                                response = "Exit-";
+                                long currentTime = System.currentTimeMillis();
+                                long entryTime = Long.parseLong(foundRequest.entryTime);
+//                                System.out.println(((currentTime - entryTime)*hourlyRate)/3600000.00);
+                                double fare = Math.max(4, Math.round(((currentTime - entryTime)*hourlyRate) / 36000.0) / 100.0);
+                                response = response + String.valueOf(fare);
+                            }
+//                            validationOutput = "userEnter.txt";
+//                            System.out.println(parking.getNearestSpot());
                             flag = false;
-                        } else {
-                            validationOutput = "userCantEnter.txt";
                         }
+//                        else {
+//                            validationOutput = "userCantEnter.txt";
+//                        }
                     }
                     System.out.println("Exiting while loop");
-                    File file = new File(WEB_ROOT, validationOutput);
-                    int fileLength = (int) file.length();
-                    String content = getContentType(validationOutput);
-                    byte[] fileData = readFileData(file, fileLength);
+//                    File file = new File(WEB_ROOT, validationOutput);
+//                    int fileLength = (int) file.length();
+//                    String content = getContentType(validationOutput);
+//                    byte[] fileData = readFileData(file, fileLength);
 
                     out.println("HTTP/1.1 200 OK");
                     out.println("Server: Java HTTP Server from Parva : 1.0");
                     out.println("Date: " + new Date());
-                    out.println("Content-type: " + content);
-                    out.println("Content-length: " + fileLength);
+                    out.println("Content-type: text/plain");
+                    out.println("Content-length: " + response.length());
                     out.println();
                     out.flush();
 
-                    dataOut.write(fileData, 0, fileLength);
+//                    dataOut.write(fileData, 0, fileLength);
+                    dataOut.write(response.getBytes());
                     dataOut.flush();
                 }
-                else if (params.contains("/checkexit?id=")) {
-
-                    String id = params.replace("/checkexit?id=", "");
-
-                    flag = true;
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(1000);
-                            flag = false;
-                        }
-                        catch (Exception e){
-                            System.err.println(e);
-                        }
-                    }).start();
-
-                    String validationOutput = "userCantExit.txt";
-
-                    while(flag) {
-                        // Check for the user's in-time being entered in the database.
-
-                        String output = "invalid";
-                        // Check for the last 10 records in the requests. If the same id exists with a valid flag, let them enter.
-                        Integer checkCount = 10;
-                        Integer lengthOfRequests = requests.size();
-                        for (int i=lengthOfRequests-1; (i>lengthOfRequests - checkCount) && (i>=0); i--) {
-                            QRRequest request = requests.get(i);
-                            if (id.equals(request.ID) && request.type.equals("exit") && request.validity.equals("valid")) {
-                                output = "valid";
-                            }
-                        }
-                        if (output == "valid") {
-                            validationOutput = "userExit.txt";
-                            flag = false;
-                        } else {
-                            validationOutput = "userCantExit.txt";
-                        }
-                    }
-
-                    File file = new File(WEB_ROOT, validationOutput);
-                    int fileLength = (int) file.length();
-                    String content = getContentType(validationOutput);
-                    byte[] fileData = readFileData(file, fileLength);
-
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: Java HTTP Server from Parva : 1.0");
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + content);
-                    out.println("Content-length: " + fileLength);
-                    out.println();
-                    out.flush();
-
-                    dataOut.write(fileData, 0, fileLength);
-                    dataOut.flush();
-                }
+//                else if (params.contains("/checkexit?id=")) {
+//
+//                    String id = params.replace("/checkexit?id=", "");
+//
+//                    flag = true;
+//                    new Thread(() -> {
+//                        try {
+//                            Thread.sleep(1000);
+//                            flag = false;
+//                        }
+//                        catch (Exception e){
+//                            System.err.println(e);
+//                        }
+//                    }).start();
+//
+//                    String validationOutput = "userCantExit.txt";
+//
+//                    while(flag) {
+//                        // Check for the user's in-time being entered in the database.
+//
+//                        String output = "invalid";
+//                        // Check for the last 10 records in the requests. If the same id exists with a valid flag, let them enter.
+//                        Integer checkCount = 10;
+//                        Integer lengthOfRequests = requests.size();
+//                        for (int i=lengthOfRequests-1; (i>lengthOfRequests - checkCount) && (i>=0); i--) {
+//                            QRRequest request = requests.get(i);
+//                            if (id.equals(request.ID) && request.type.equals("exit") && request.validity.equals("valid")) {
+//                                output = "valid";
+//                            }
+//                        }
+//                        if (output == "valid") {
+//                            validationOutput = "userExit.txt";
+//                            flag = false;
+//                        } else {
+//                            validationOutput = "userCantExit.txt";
+//                        }
+//                    }
+//
+//                    File file = new File(WEB_ROOT, validationOutput);
+//                    int fileLength = (int) file.length();
+//                    String content = getContentType(validationOutput);
+//                    byte[] fileData = readFileData(file, fileLength);
+//
+//                    out.println("HTTP/1.1 200 OK");
+//                    out.println("Server: Java HTTP Server from Parva : 1.0");
+//                    out.println("Date: " + new Date());
+//                    out.println("Content-type: " + content);
+//                    out.println("Content-length: " + fileLength);
+//                    out.println();
+//                    out.flush();
+//
+//                    dataOut.write(fileData, 0, fileLength);
+//                    dataOut.flush();
+//                }
                 else if (params.contains("/getparking")) {
                     var parkingString = "";
                     for (int i=0; i<parking.parkingGuide.length; i++) {
@@ -355,11 +376,13 @@ class QRRequest {
     String ID = "invalid";
     String validity = "invalid";
     String type = "entry";
+    String entryTime = "";
 
-    public QRRequest(String id, String val, String t) {
+    public QRRequest(String id, String val, String t, String time) {
         ID = id;
         validity = val;
         type = t;
+        entryTime = time;
     }
 
     public static void main(String[] args) {
@@ -505,8 +528,10 @@ public class Parking {
                     pathVisited = new boolean[ROWS][COLUMNS];
                     q.clear();
 //                    return path + pDir[i];
-                    System.out.println(path + pDir[i]);
-                    return getPathDirections("E" + path + pDir[i]);
+//                    System.out.println(path + pDir[i]);
+                    var parkingNumber = (char)(65 + adjx) + String.valueOf(adjy + 1);
+//                    System.out.println(parkingNumber);
+                    return parkingNumber + "-" + getPathDirections("E" + path + pDir[i]);
                 }
             }
 
