@@ -398,26 +398,27 @@ public class Parking {
             {
                     {"xx", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "xx"},
                     {"ss", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "pn"},
-                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
+                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pa", "pa", "pa", "rv", "pa"},
+                    {"pn", "rv", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "rv", "pn"},
                     {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pn"},
-                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "rv", "pa"},
-                    {"pa", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "se"},
-                    {"xx", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "pa", "xx"}
+                    {"pn", "rv", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "rv", "pn"},
+                    {"pn", "rv", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "rv", "pa"},
+                    {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pn"},
+                    {"pn", "rv", "pn", "pa", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pa", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "rv", "pn"},
+                    {"pa", "rv", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pa", "pn", "pn", "rv", "pn"},
+                    {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pn"},
+                    {"pa", "rv", "pn", "pn", "pa", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "rv", "pa"},
+                    {"pn", "rv", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pa", "rv", "pn"},
+                    {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pn"},
+                    {"pn", "rv", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "rv", "pn"},
+                    {"pa", "rv", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "rv", "pa"},
+                    {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rv", "pn"},
+                    {"pn", "rv", "pn", "pa", "pa", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "rv", "pn"},
+                    {"pn", "rv", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "rv", "pa"},
+                    {"pn", "rv", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "rh", "se"},
+                    {"xx", "pn", "pa", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "xx"}
             };
+
     static boolean[][] pathVisited = new boolean[ROWS][COLUMNS];
 
     static int[] xVal = new int[]{ 0, 1, 0, -1 };
@@ -546,7 +547,7 @@ public class Parking {
         }
         pathVisited = new boolean[ROWS][COLUMNS];
         q.clear();
-        return "No parking available";
+        return "Parking full.";
     }
 
 }

@@ -8,9 +8,9 @@
             }
 
             .heading-h1 {
-                text-align: start;
-                width: 36%;
-                margin-left: 32%;
+                text-align: center;
+                /*width: 36%;*/
+                /*margin-left: 32%;*/
             }
 
             .grid-container {
@@ -83,7 +83,7 @@
     </head>
     <body>
         <div class="heading">
-            <h1 id="main" class="heading-h1">Parker: The Server is up and running</h1>
+            <h1 id="main" class="heading-h1">Parker: The Sensor Simulation</h1>
         </div>
 
         <div id="main-parking" class="grid-container">
@@ -93,14 +93,14 @@
             const main = document.getElementById("main");
             const parking = document.getElementById("main-parking");
 
-            const a = 4;
-            let b = 0;
-            function change() {
-                b = (b + 1) % a;
-                let str = ".".repeat(b);
-                main.innerHTML = "Parker: The Server is up and running" + str;
-            }
-            setInterval(change, 500);
+            // const a = 4;
+            // let b = 0;
+            // function change() {
+            //     b = (b + 1) % a;
+            //     let str = ".".repeat(b);
+            //     main.innerHTML = "Parker: The Server is up and running" + str;
+            // }
+            // setInterval(change, 500);
 
             function setParking(parkingStruct) {
                 parking.innerHTML = "";
