@@ -1,15 +1,17 @@
-// ignore_for_file: avoid_print
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:parker/components/custom_button.dart';
 import 'package:parker/components/custom_text_field.dart';
 import 'sign_in.dart';
-import 'dashboard.dart';
+import 'user_home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:parker/constants.dart';
 
 class SignUp extends StatefulWidget {
+  /// sing up screen
+  /// this provides sign up with email and password
+
   const SignUp({Key? key}) : super(key: key);
   static String id = 'SignUp';
 
@@ -18,20 +20,32 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  // firebase instance for sign up
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  // firebase cloud store instance for table 'users'
   final CollectionReference _users =
       FirebaseFirestore.instance.collection('users');
+  // form label for widget tree
   final _formKey = GlobalKey<FormState>();
 
+  // field controller for first name
   TextEditingController fNameController = TextEditingController();
+  // field controller for last name
   TextEditingController lNameController = TextEditingController();
+  // field controller for email
   TextEditingController emailController = TextEditingController();
+  // field controller for password
   TextEditingController passwordController = TextEditingController();
+  // field controller for confirm password
   TextEditingController passwordConfirmController = TextEditingController();
+  // confirm password visibility toggle
   bool isObscureConfirm = true;
+  // password visibility toggle
   bool isObscure = true;
 
   Future<void> addUser(CollectionReference users) async {
+    /// add user information into firebase cloud store
+
     if (_auth.currentUser?.uid != null) {
       return await users
           .doc(_auth.currentUser?.uid)
@@ -40,25 +54,30 @@ class _SignUpState extends State<SignUp> {
             'lName': lNameController.text,
             'email': emailController.text,
             'password': passwordController.text,
+            'cardNumber': ' ',
+            'cvv': '000',
+            'expMonth': 01,
+            'expYear': 26,
+            'entered': false,
+            'entryTime': DateTime.now().millisecondsSinceEpoch,
           })
           .then((value) => print("User Added"))
-          .catchError((error) => print("Failed to add user: $error"));
+          .catchError(
+              (error) => print("Failed to add user: $error")); //add error case
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    //double w = MediaQuery.of(context).size.width;
-    double h = MediaQuery.of(context).size.height;
+    double h = MediaQuery.of(context).size.height; // height of screen
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Form(
-              key: _formKey,
+              key: _formKey, // form label
               child: Column(
-                //mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(
@@ -67,12 +86,7 @@ class _SignUpState extends State<SignUp> {
                   const Text(
                     'Hello!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 35.0,
-                      fontFamily: "Horizon",
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: kHeaderTextStyle,
                   ),
                   SizedBox(
                     height: h * 0.01,
@@ -81,9 +95,8 @@ class _SignUpState extends State<SignUp> {
                     'Signup to get started',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.black54,
+                      color: kDarkTextColor,
                       fontSize: 20.0,
-                      fontFamily: "Horizon",
                     ),
                   ),
                   SizedBox(
@@ -99,6 +112,7 @@ class _SignUpState extends State<SignUp> {
                           textController: fNameController,
                           customValidator: (value) {
                             if (value == null || value.isEmpty) {
+                              // empty field
                               return 'Enter First Name';
                             }
                             return null;
@@ -113,6 +127,7 @@ class _SignUpState extends State<SignUp> {
                           textController: lNameController,
                           customValidator: (value) {
                             if (value == null || value.isEmpty) {
+                              // empty field
                               return 'Enter Last Name';
                             }
                             return null;
@@ -130,6 +145,7 @@ class _SignUpState extends State<SignUp> {
                     textController: emailController,
                     customValidator: (value) {
                       if (value == null || value.isEmpty) {
+                        // empty field
                         return 'Enter Email Address';
                       }
                       return null;
@@ -142,23 +158,26 @@ class _SignUpState extends State<SignUp> {
                     obscureText: isObscure,
                     customValidator: (value) {
                       if (value == null || value.isEmpty) {
+                        // empty field
                         return 'Please enter password';
                       }
                       if (value.toString().length <= 6) {
+                        // password length <= 6
                         return 'Password is to week';
                       }
                       return null;
                     },
                     iconButton: IconButton(
                       padding: const EdgeInsets.only(right: 15.0),
-                      focusColor: Colors.black38,
                       onPressed: () {
+                        // visibility toggle
                         setState(() {
                           isObscure = !isObscure;
                         });
                       },
                       icon: Icon(
                           isObscure ? Icons.visibility : Icons.visibility_off),
+                      color: kDarkColor,
                     ),
                     hintText: 'Password',
                     textFieldInput: TextInputType.visiblePassword,
@@ -171,12 +190,15 @@ class _SignUpState extends State<SignUp> {
                     obscureText: isObscureConfirm,
                     customValidator: (value) {
                       if (value == null || value.isEmpty) {
+                        // empty field
                         return 'Please enter password';
                       }
                       if (value.toString().length <= 6) {
+                        // password length <= 6
                         return 'Password is to week';
                       }
                       if (value.toString() != passwordController.text) {
+                        // password
                         return 'Password do not match';
                       }
 
@@ -184,14 +206,16 @@ class _SignUpState extends State<SignUp> {
                     },
                     iconButton: IconButton(
                       padding: const EdgeInsets.only(right: 15.0),
-                      focusColor: Colors.black38,
                       onPressed: () {
+                        // toggle visibility
                         setState(() {
                           isObscureConfirm = !isObscureConfirm;
                         });
                       },
-                      icon: Icon(
-                          isObscure ? Icons.visibility : Icons.visibility_off),
+                      icon: Icon(isObscureConfirm
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      color: kDarkColor,
                     ),
                     hintText: 'Confirm Password',
                     textFieldInput: TextInputType.visiblePassword,
@@ -205,6 +229,7 @@ class _SignUpState extends State<SignUp> {
                     title: 'Sign Up',
                     textSize: 17.0,
                     buttonFunction: () async {
+                      // firebase sign up functionality
                       try {
                         if (_formKey.currentState!.validate()) {
                           await _auth
@@ -213,16 +238,21 @@ class _SignUpState extends State<SignUp> {
                                   password: passwordController.text)
                               .whenComplete(
                                 () => addUser(_users),
-                              )
-                              .whenComplete(
-                                () => Navigator.popAndPushNamed(
-                                    context, DashBoard.id),
                               );
+                          // user sing up then redirect to user_home screen
+                          Navigator.restorablePushNamedAndRemoveUntil(
+                              context, UserHome.id, (route) => false);
                         }
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print(e);
-                        }
+                      } on FirebaseAuthException catch (e) {
+                        // error msg
+                        Fluttertoast.showToast(
+                          msg: e.message.toString(),
+                          toastLength: Toast.LENGTH_SHORT,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: kToastBackColor,
+                          textColor: kDarkTextColor,
+                          fontSize: 16.0,
+                        );
                       }
                     },
                   ),
@@ -236,7 +266,7 @@ class _SignUpState extends State<SignUp> {
                         'Already have an Account?',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: kDarkTextColor,
                           fontSize: 15.0,
                           fontFamily: "Horizon",
                         ),
@@ -245,7 +275,10 @@ class _SignUpState extends State<SignUp> {
                         onPressed: () {
                           Navigator.popAndPushNamed(context, SignIn.id);
                         },
-                        child: const Text('Sign In    '),
+                        child: const Text(
+                          'Sign In    ',
+                          style: TextStyle(color: kDarkColor),
+                        ),
                         style: ButtonStyle(
                           padding: MaterialStateProperty.all(
                               const EdgeInsets.symmetric(horizontal: 3.0)),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:parker/constants.dart';
 
 class CustomTextField extends StatelessWidget {
+  /// custom text field for app
+
   const CustomTextField({
     Key? key,
     this.obscureText = false,
@@ -16,8 +19,8 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? textFieldInput;
   final TextEditingController? textController;
   final String? hintText;
-  final bool obscureText;
-  final IconButton? iconButton;
+  final bool obscureText; // for password text field
+  final IconButton? iconButton; // for password field visibility icon
   final double rightPadding;
   final double leftPadding;
   final dynamic customValidator;
@@ -30,37 +33,10 @@ class CustomTextField extends StatelessWidget {
         obscureText: obscureText,
         keyboardType: textFieldInput,
         controller: textController,
-        cursorColor: Colors.black54,
         validator: customValidator,
-        decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+        decoration: kTextFieldDecoration.copyWith(
           suffixIcon: iconButton,
           hintText: hintText,
-          hintStyle: const TextStyle(
-            color: Colors.black26,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          focusColor: Colors.black12,
-          border: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.white,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(15.0)),
-          ),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.white,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(15.0)),
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.white,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(15.0)),
-          ),
         ),
       ),
     );

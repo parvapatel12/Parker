@@ -1,16 +1,18 @@
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class NetworkHelper {
+  /// class to help with connection with API server
+
+  // constructor
   NetworkHelper(this.url);
 
   final String url;
 
   Future sendData() async {
-    if (kDebugMode) {
-      print(Uri.parse(url));
-    }
+    /// http post request
+    /// return API response if statusCode is 201
+    /// else return statusCode
+
     http.Response response = await http.post(
       Uri.parse(url),
     );
@@ -19,22 +21,22 @@ class NetworkHelper {
       String data = response.body;
       return data;
     } else {
-      if (kDebugMode) {
-        print(response.statusCode);
-      }
+      return response.statusCode;
     }
   }
 
   Future getData() async {
+    /// http get request
+    /// return API response if statusCode is 200
+    /// else return statusCode
+
     http.Response response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       String data = response.body;
       return data;
     } else {
-      if (kDebugMode) {
-        print(response.statusCode);
-      }
+      return response.statusCode;
     }
   }
 }

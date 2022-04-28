@@ -1,32 +1,39 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:parker/components/custom_text_field.dart';
 import 'package:parker/components/custom_button.dart';
+import 'package:parker/constants.dart';
 import 'sign_up.dart';
-import 'dashboard.dart';
+import 'user_home.dart';
 import 'admin_home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignIn extends StatefulWidget {
+  /// Sign In screen
+  /// this provides sign in functionality with email and password.
+
   const SignIn({Key? key}) : super(key: key);
-  static String id = 'SignIn';
+  static String id = 'SignIn'; // for navigation between screen
 
   @override
   State<SignIn> createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
+  // firebase authentication instance for sign in
   final _auth = FirebaseAuth.instance;
+  // form label for widget tree
   final _formKey = GlobalKey<FormState>();
 
+  // controller for email text field
   TextEditingController emailController = TextEditingController();
+  // controller for password text field
   TextEditingController passwordController = TextEditingController();
-  bool isObscure = true;
+  bool isObscure = true; // password visibility toggle
 
   @override
   Widget build(BuildContext context) {
-    //double w = MediaQuery.of(context).size.width;
-    double h = MediaQuery.of(context).size.height;
+    double h = MediaQuery.of(context).size.height; // height of screen
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -43,21 +50,16 @@ class _SignInState extends State<SignIn> {
                   const Text(
                     'Hello Again!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 35.0,
-                      fontFamily: "Horizon",
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: kHeaderTextStyle,
                   ),
                   SizedBox(
-                    height: h * 0.01,
+                    height: h * 0.02,
                   ),
                   const Text(
                     'Welcome back you\'ve\nbeen missed!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.black54,
+                      color: kDarkTextColor,
                       fontSize: 20.0,
                       fontFamily: "Horizon",
                     ),
@@ -70,7 +72,9 @@ class _SignInState extends State<SignIn> {
                     textFieldInput: TextInputType.emailAddress,
                     textController: emailController,
                     customValidator: (value) {
+                      // text field validator
                       if (value == null || value.isEmpty) {
+                        // for empty field
                         return 'Please enter Email';
                       }
                       return null;
@@ -83,23 +87,22 @@ class _SignInState extends State<SignIn> {
                     obscureText: isObscure,
                     customValidator: (value) {
                       if (value == null || value.isEmpty) {
+                        // for empty field
                         return 'Please enter password';
-                      }
-                      if (value.toString().length <= 6) {
-                        return 'Password is too week';
                       }
                       return null;
                     },
                     iconButton: IconButton(
                       padding: const EdgeInsets.only(right: 15.0),
-                      focusColor: Colors.black38,
                       onPressed: () {
+                        // password visibility toggle
                         setState(() {
                           isObscure = !isObscure;
                         });
                       },
                       icon: Icon(
                           isObscure ? Icons.visibility : Icons.visibility_off),
+                      color: kDarkColor,
                     ),
                     hintText: 'Password',
                     textFieldInput: TextInputType.visiblePassword,
@@ -113,6 +116,7 @@ class _SignInState extends State<SignIn> {
                     title: 'Sign In',
                     textSize: 17.0,
                     buttonFunction: () async {
+                      // firebase sign in function
                       try {
                         if (_formKey.currentState!.validate()) {
                           await _auth.signInWithEmailAndPassword(
@@ -120,17 +124,25 @@ class _SignInState extends State<SignIn> {
                               password: passwordController.text);
                           if (emailController.text.trim() == 'admin@nexus.co' &&
                               passwordController.text == 'admin123') {
+                            // for admin sign in
                             Navigator.pushNamedAndRemoveUntil(
                                 context, AdminHome.id, (route) => false);
                           } else {
+                            // for user sign in
                             Navigator.pushNamedAndRemoveUntil(
-                                context, DashBoard.id, (route) => false);
+                                context, UserHome.id, (route) => false);
                           }
                         }
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print(e);
-                        }
+                      } on FirebaseAuthException catch (e) {
+                        // error msg
+                        Fluttertoast.showToast(
+                          msg: e.message.toString(),
+                          toastLength: Toast.LENGTH_SHORT,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: kToastBackColor,
+                          textColor: kDarkTextColor,
+                          fontSize: 16.0,
+                        );
                       }
                     },
                   ),
@@ -144,16 +156,18 @@ class _SignInState extends State<SignIn> {
                         'Not a member?',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: kDarkTextColor,
                           fontSize: 15.0,
-                          fontFamily: "Horizon",
                         ),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.popAndPushNamed(context, SignUp.id);
                         },
-                        child: const Text('Register Now'),
+                        child: const Text(
+                          'Register Now',
+                          style: TextStyle(color: kDarkColor),
+                        ),
                         style: ButtonStyle(
                           padding: MaterialStateProperty.all(
                               const EdgeInsets.symmetric(horizontal: 3.0)),
@@ -168,5 +182,12 @@ class _SignInState extends State<SignIn> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }
