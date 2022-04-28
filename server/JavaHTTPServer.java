@@ -15,27 +15,23 @@ import java.util.*;
 public class JavaHTTPServer implements Runnable{
 
     static final File WEB_ROOT = new File(".");
-    static final String DEFAULT_FILE = "index.html";
-    static final String FILE_NOT_FOUND = "404.html";
-    static final String METHOD_NOT_SUPPORTED = "not_supported.html";
+    static final String FILE_NOT_FOUND = "404.html"; //When a particular file is not obtained while any API call, the server will return the content of this file
 
-    static final String hostname = "192.168.0.203";
+    static final String hostname = "192.168.0.203"; // Server will be hosted to the ip : 192.168.0.203:8080 and all the API calls will be made at this url
     static final int PORT = 8080;
 
-    static final boolean verbose = true;
+    static final List<QRRequest> requests = new ArrayList<QRRequest>(); // We have kept this array to store the past requests that are received from the scanner
+    static int hourlyRate = 4; // Hourly rate that will be used to fetch the total fare of the user
 
-    static final List<QRRequest> requests = new ArrayList<QRRequest>();
-    static Boolean flag = false;
-    static int hourlyRate = 4;
+    static Parking parking = new Parking(); // A static instance of the class Parking that handles the status and values of the parking spots along with providing us the nearest parking spot
 
-    static Parking parking = new Parking();
-
-    // Client Connection via Socket Class\
-    private Socket connect;
+    private Socket connect; // Client Connection via Socket Class
 
     public JavaHTTPServer(Socket c) {
         connect = c;
-    }
+    } // Constructor
+
+    static Boolean flag = false;
 
     public static void main(String[] args) {
         try {
@@ -47,9 +43,7 @@ public class JavaHTTPServer implements Runnable{
             while (true) {
                 JavaHTTPServer myServer = new JavaHTTPServer(serverConnect.accept());
 
-                if (verbose) {
-                    System.out.println("Connecton opened. (" + new Date() + ")");
-                }
+                System.out.println("Connecton opened. (" + new Date() + ")");
 
                 // create dedicated thread to manage the client connection
                 Thread thread = new Thread(myServer);
@@ -61,7 +55,8 @@ public class JavaHTTPServer implements Runnable{
         }
     }
 
-    public static void setTimeoutByParva(Runnable runnable, int delay){
+    // This function would start an independent thread for delay/1000 seconds and completes once the sleep is over.
+    public static void setTimeoutForWaitingTime(Runnable runnable, int delay){
         new Thread(() -> {
             try {
                 Thread.sleep(delay);
@@ -75,46 +70,41 @@ public class JavaHTTPServer implements Runnable{
 
     @Override
     public void run() {
+
         // we manage our particular client connection
         BufferedReader in = null; PrintWriter out = null; BufferedOutputStream dataOut = null;
         String fileRequested = null;
         String params = null;
 
         try {
-            // we read characters from the client via input stream on the socket
-            in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
-            // we get character output stream to client (for headers)
-            out = new PrintWriter(connect.getOutputStream());
-            // get binary output stream to client (for requested data)
-            dataOut = new BufferedOutputStream(connect.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(connect.getInputStream())); // Read characters from the client via input stream on the socket
+            out = new PrintWriter(connect.getOutputStream()); // Get character output stream to client (for headers)
+            dataOut = new BufferedOutputStream(connect.getOutputStream()); // Get binary output stream to client (for requested data)
 
-            // get first line of the request from the client
-            String input = in.readLine();
-            // we parse the request with a string tokenizer
-            System.out.println(input);
+            String input = in.readLine(); // Get first line of the request from the client
+            System.out.println(input); // Parse the request with a string tokenizer
             StringTokenizer parse = new StringTokenizer(input);
-            String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
-            // we get file requested
-            params = parse.nextToken().toLowerCase();
+            String method = parse.nextToken().toUpperCase(); // Get the HTTP method of the client
+
+            params = parse.nextToken().toLowerCase(); // Get the query parameters
 
             // POST request from the Scanner
             if (method.equals("POST")) {
 
-                if (params.equals("/") || params.equals("/?")) {
+                if (params.equals("/") || params.equals("/?")) { // When no parameter is passed in the API call
 
                     System.out.println("No user specified. Nothing can be done.");
 
-                } else if (params.contains("/entry?id=")) { // Pass url/enter?id=7I1DZpCvHdLfNIa2fL91&validity=valid
+                }
+                else if (params.contains("/entry?id=")) { // For the entry POST request from the scanner
 
                     String ID = params.replace("/entry?id=", "");
-//                    String[] details = params.replace("/enter?", "").split("&");
-//                    String ID = details[0].split("=")[1];
-//                    String validity = details[1].split("=")[1];
                     String validity = "valid";
                     String type = "entry";
                     requests.add(new QRRequest(ID, validity, type, ""));
 
-                }  else if (params.contains("/exit?id=")) { // Pass url/exit?id=7I1DZpCvHdLfNIa2fL91
+                }
+                else if (params.contains("/exit?id=")) { // For the exit POST request from the scanner
 
                     String[] details = params.replace("/exit?", "").split("&");
                     String ID = details[0].split("=")[1];
@@ -123,19 +113,22 @@ public class JavaHTTPServer implements Runnable{
                     requests.add(new QRRequest(ID, "valid", type, entryTime));
 
                 }
-                for (QRRequest r : requests) {
-                    System.out.println(r.ID + ", " + r.validity + ", " + r.type + ", " + r.entryTime);
-                }
 
-            } else if (method.equals("GET")) {
+            }
+            // GET request from the client
+            else if (method.equals("GET")) {
 
-                if (params.equals("/") || params.equals("/?")) {
+                if (params.equals("/") || params.equals("/?")) { // When no parameter is passed in the API call
+
                     System.out.println("No user specified. Nothing can be done.");
+
                 }
-                else if (params.contains("/check?id=")) {
+                else if (params.contains("/check?id=")) { // For the entry or exit GET request from the client
+
                     String id = params.replace("/check?id=", "");
 
                     flag = true;
+                    // Start a thread to stop the process when there is a timeout of request
                     new Thread(() -> {
                         try {
                             Thread.sleep(15000);
@@ -146,52 +139,54 @@ public class JavaHTTPServer implements Runnable{
                         }
                     }).start();
 
-//                    String validationOutput = "userCantEnter.txt";
-
-                    System.out.println("Entering while loop");
                     QRRequest foundRequest = new QRRequest("", "", "", "");
                     String response = "You can't go.";
-                    while(flag) {
-                        // Check for the user's in-time being entered in the database.
+
+                    while(flag) { // This loop will keep on checking for a response from scanner for the same user to enter/exit
 
                         String output = "invalid";
-                        // Check for the last 10 records in the requests. If the same id exists with a valid flag, let them enter.
+
                         Integer checkCount = 10;
                         Integer lengthOfRequests = requests.size();
+
+                        // Check for the last 10 records in the requests. If the same id exists with a valid flag, the user can enter/exit
                         for (int i=lengthOfRequests-1; (i>lengthOfRequests - checkCount) && (i>=0); i--) {
+
                             QRRequest request = requests.get(i);
                             if (id.equals(request.ID) && request.validity.equals("valid")) {
+                                // If a response with the same id exists, the user is valid
+
                                 output = "valid";
                                 foundRequest = request;
                                 requests.remove(i);
                                 break;
+
                             }
+
                         }
-                        if (output == "valid") {
-                            if (foundRequest.type.equals("entry")) {
-                                response = "Enter-" + parking.getNearestSpot();
-                            } else if (foundRequest.type.equals("exit")) {
+                        if (output == "valid") { // The is validated successfully and can go ahead
+
+                            if (foundRequest.type.equals("entry")) { // If the user wants to enter
+
+                                response = "Enter-" + parking.getNearestSpot(); // Get the nearest available parking spot and return the details as response
+
+                            }
+                            else if (foundRequest.type.equals("exit")) { // If the user wants to exit
+
                                 response = "Exit-";
                                 long currentTime = System.currentTimeMillis();
                                 long entryTime = Long.parseLong(foundRequest.entryTime);
-//                                System.out.println(((currentTime - entryTime)*hourlyRate)/3600000.00);
-                                double fare = Math.max(4, Math.round(((currentTime - entryTime)*hourlyRate) / 36000.0) / 100.0);
+                                double fare = Math.max(4, Math.round(((currentTime - entryTime)*hourlyRate) / 36000.0) / 100.0); // Calculate the fare that the user needs to pay while exiting
                                 response = response + String.valueOf(fare);
-                            }
-//                            validationOutput = "userEnter.txt";
-//                            System.out.println(parking.getNearestSpot());
-                            flag = false;
-                        }
-//                        else {
-//                            validationOutput = "userCantEnter.txt";
-//                        }
-                    }
-                    System.out.println("Exiting while loop");
-//                    File file = new File(WEB_ROOT, validationOutput);
-//                    int fileLength = (int) file.length();
-//                    String content = getContentType(validationOutput);
-//                    byte[] fileData = readFileData(file, fileLength);
 
+                            }
+                            flag = false;
+
+                        }
+
+                    }
+
+                    // Filling in the necessary details and headers for the outputstream's response
                     out.println("HTTP/1.1 200 OK");
                     out.println("Server: Java HTTP Server from Parva : 1.0");
                     out.println("Date: " + new Date());
@@ -200,65 +195,13 @@ public class JavaHTTPServer implements Runnable{
                     out.println();
                     out.flush();
 
-//                    dataOut.write(fileData, 0, fileLength);
+                    // Filling the response in the outputstream
                     dataOut.write(response.getBytes());
                     dataOut.flush();
+
                 }
-//                else if (params.contains("/checkexit?id=")) {
-//
-//                    String id = params.replace("/checkexit?id=", "");
-//
-//                    flag = true;
-//                    new Thread(() -> {
-//                        try {
-//                            Thread.sleep(1000);
-//                            flag = false;
-//                        }
-//                        catch (Exception e){
-//                            System.err.println(e);
-//                        }
-//                    }).start();
-//
-//                    String validationOutput = "userCantExit.txt";
-//
-//                    while(flag) {
-//                        // Check for the user's in-time being entered in the database.
-//
-//                        String output = "invalid";
-//                        // Check for the last 10 records in the requests. If the same id exists with a valid flag, let them enter.
-//                        Integer checkCount = 10;
-//                        Integer lengthOfRequests = requests.size();
-//                        for (int i=lengthOfRequests-1; (i>lengthOfRequests - checkCount) && (i>=0); i--) {
-//                            QRRequest request = requests.get(i);
-//                            if (id.equals(request.ID) && request.type.equals("exit") && request.validity.equals("valid")) {
-//                                output = "valid";
-//                            }
-//                        }
-//                        if (output == "valid") {
-//                            validationOutput = "userExit.txt";
-//                            flag = false;
-//                        } else {
-//                            validationOutput = "userCantExit.txt";
-//                        }
-//                    }
-//
-//                    File file = new File(WEB_ROOT, validationOutput);
-//                    int fileLength = (int) file.length();
-//                    String content = getContentType(validationOutput);
-//                    byte[] fileData = readFileData(file, fileLength);
-//
-//                    out.println("HTTP/1.1 200 OK");
-//                    out.println("Server: Java HTTP Server from Parva : 1.0");
-//                    out.println("Date: " + new Date());
-//                    out.println("Content-type: " + content);
-//                    out.println("Content-length: " + fileLength);
-//                    out.println();
-//                    out.flush();
-//
-//                    dataOut.write(fileData, 0, fileLength);
-//                    dataOut.flush();
-//                }
-                else if (params.contains("/getparking")) {
+                else if (params.contains("/getparking")) { // For the UI of sensor simulation to get the status of the parkings
+
                     var parkingString = "";
                     for (int i=0; i<parking.parkingGuide.length; i++) {
                         parkingString = parkingString + String.join("-", parking.parkingGuide[i]) + "+";
@@ -274,8 +217,10 @@ public class JavaHTTPServer implements Runnable{
 
                     dataOut.write(parkingString.getBytes());
                     dataOut.flush();
+
                 }
-                else if (params.contains("/setparking?")) {
+                else if (params.contains("/setparking?")) { // For the UI of sensor simulation to set a value to a particular parking spot
+
                     String[] values = params.replace("/setparking?", "").split("&");
 
                     String[] coordinates = values[0].replace("coordinates=", "").split("-");
@@ -297,16 +242,19 @@ public class JavaHTTPServer implements Runnable{
 
                     dataOut.write(response.getBytes());
                     dataOut.flush();
+
                 }
+
             }
-        } catch (FileNotFoundException fnfe) {
+
+        } catch (FileNotFoundException fnfe) { // Handling file not found error
             try {
                 fileNotFound(out, dataOut, fileRequested);
             } catch (IOException ioe) {
                 System.err.println("Error with file not found exception : " + ioe.getMessage());
             }
 
-        } catch (IOException ioe) {
+        } catch (IOException ioe) { // Handling IOException
             System.err.println("Server error : " + ioe);
         } finally {
             try {
@@ -317,15 +265,13 @@ public class JavaHTTPServer implements Runnable{
             } catch (Exception e) {
                 System.err.println("Error closing stream : " + e.getMessage());
             }
-
-            if (verbose) {
-                System.out.println("Connection closed.\n");
-            }
+            System.out.println("Connection closed.\n");
         }
 
 
     }
 
+    // Function for reading a file from the path
     private byte[] readFileData(File file, int fileLength) throws IOException {
         FileInputStream fileIn = null;
         byte[] fileData = new byte[fileLength];
@@ -341,14 +287,9 @@ public class JavaHTTPServer implements Runnable{
         return fileData;
     }
 
-    private String getContentType(String fileRequested) {
-        if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
-            return "text/html";
-        else
-            return "text/plain";
-    }
-
+    // Function to get the file value when file not found exception occurs
     private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
+
         File file = new File(WEB_ROOT, FILE_NOT_FOUND);
         int fileLength = (int) file.length();
         String content = "text/html";
@@ -365,13 +306,13 @@ public class JavaHTTPServer implements Runnable{
         dataOut.write(fileData, 0, fileLength);
         dataOut.flush();
 
-        if (verbose) {
-            System.out.println("File " + fileRequested + " not found");
-        }
+        System.out.println("File " + fileRequested + " not found");
+
     }
 
 }
 
+// Class for generating instances of the requests sent from the scanner
 class QRRequest {
     String ID = "invalid";
     String validity = "invalid";
@@ -390,10 +331,12 @@ class QRRequest {
     }
 }
 
+// Class for handling all the functionalities of the parking
 public class Parking {
-    static int ROWS = 21;
-    static int COLUMNS = 30;
+    static int ROWS = 21; // Number of rows in the parking area
+    static int COLUMNS = 30; // Number of columns in the parking area
 
+    // 2 dimensional array of parking spots that would handle the availability and unavailability of the parking spots
     static String[][] parkingGuide =
             {
                     {"xx", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "xx"},
@@ -419,16 +362,15 @@ public class Parking {
                     {"xx", "pn", "pa", "pn", "pn", "pn", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pa", "pa", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "pn", "xx"}
             };
 
-    static boolean[][] pathVisited = new boolean[ROWS][COLUMNS];
+    static boolean[][] pathVisited = new boolean[ROWS][COLUMNS]; // This array will be used during the BFS while traversing through the paths
 
     static int[] xVal = new int[]{ 0, 1, 0, -1 };
     static int[] yVal = new int[]{ 1, 0, -1, 0 };
     static char[] dir = new char[]{ 'E', 'S', 'W', 'N' };
 
-    public static void Parking() {
+    public static void Parking() { }
 
-    }
-
+    // Function for converting a calculated path to user centric path/route
     public static String getPathDirections(String Dir) {
         String path = "S";
         int l = Dir.length();
@@ -494,7 +436,9 @@ public class Parking {
         System.out.println("New Parking created.");
     }
 
+    // Algorithm for getting the nearest available parking spot. Uses queue for running a breadth-first-search algorithm in the matrix
     public static String getNearestSpot() {
+
         int row = 1, column = 1;
         int[] pxVal = new int[2], pyVal = new int[2];
         char[] pDir = new char[2];
@@ -524,14 +468,11 @@ public class Parking {
             for(int i=0; i<pxVal.length; i++) {
                 int adjx = x + pxVal[i];
                 int adjy = y + pyVal[i];
-                if (parkingGuide[adjx][adjy].charAt(1) == 'a') {
+                if (parkingGuide[adjx][adjy].charAt(1) == 'a') { // Available parking spot found.
                     flag = false;
                     pathVisited = new boolean[ROWS][COLUMNS];
                     q.clear();
-//                    return path + pDir[i];
-//                    System.out.println(path + pDir[i]);
                     var parkingNumber = (char)(65 + adjx) + String.valueOf(adjy + 1);
-//                    System.out.println(parkingNumber);
                     return parkingNumber + "-" + getPathDirections("E" + path + pDir[i]);
                 }
             }
@@ -552,6 +493,7 @@ public class Parking {
 
 }
 
+// Class for storing a cell's attributes in the queue while running BFS
 class Cell {
     int first, second;
     String path = "";

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
+
     <head>
+
         <style>
             .heading {
                 width: 100%;
@@ -9,14 +11,11 @@
 
             .heading-h1 {
                 text-align: center;
-                /*width: 36%;*/
-                /*margin-left: 32%;*/
             }
 
             .grid-container {
                 display: inline-grid;
                 grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1.5fr;
-                /*grid-gap: 2px;*/
                 background-color: #ffffff;
                 width: 60%;
                 margin-left: 20%;
@@ -24,10 +23,8 @@
             }
 
             .grid-container > div {
-                /*background-color: rgba(255, 255, 255, 0.8);*/
                 text-align: center;
                 padding: 10px 0;
-                /*font-size: 30px;*/
                 user-select: none;
                 font-size: 12px;
             }
@@ -42,22 +39,18 @@
             }
 
             .parking-available {
-                /*height: 35px;*/
                 background-color: #71db80;
                 border: 4px solid #fff;
                 border-radius: 8px;
-                /*line-height: 31px;*/
             }
             .parking-available:hover {
                 cursor: pointer;
                 background-color: #8af399;
             }
             .parking-unavailable {
-                /*height: 35px;*/
                 background-color: #db7171;
                 border: 4px solid #fff;
                 border-radius: 8px;
-                /*line-height: 31px;*/
                 color: white;
             }
             .parking-unavailable:hover {
@@ -80,8 +73,11 @@
                 color: #e20000;
             }
         </style>
+
     </head>
+
     <body>
+
         <div class="heading">
             <h1 id="main" class="heading-h1">Parker: The Sensor Simulation</h1>
         </div>
@@ -90,21 +86,13 @@
         </div>
 
         <script>
-            const main = document.getElementById("main");
             const parking = document.getElementById("main-parking");
 
-            // const a = 4;
-            // let b = 0;
-            // function change() {
-            //     b = (b + 1) % a;
-            //     let str = ".".repeat(b);
-            //     main.innerHTML = "Parker: The Server is up and running" + str;
-            // }
-            // setInterval(change, 500);
-
+            // Function to generating the layout of the parking
             function setParking(parkingStruct) {
                 parking.innerHTML = "";
 
+                // For adding a row of numbers on the top
                 for (let i=0; i<parkingStruct[0].length + 1; i++) {
                     parking.innerHTML = parking.innerHTML + "<div class='numbers'>" + i + "</div>";
                 }
@@ -155,7 +143,10 @@
             }
 
             let parkingGrid = "";
+
+            // Send a GET request to the server for fetching the current parking area
             function httpGet() {
+
                 const url = "http://192.168.0.203:8080/getparking";
                 const headers = {};
 
@@ -165,10 +156,13 @@
                     headers: headers
                 })
                     .then((response) => {
+
                         if (!response.ok) {
                             parking.innerHTML = "Server not found.";
                             throw new Error(response.error)
                         }
+
+                        // Set the value of the response from server to the local variable so that UI can be updated
                         response.text().then(function (text) {
                             let tmp = (text.split("+"));
                             parkingGrid = [];
@@ -177,22 +171,27 @@
                             }
                             setParking(parkingGrid);
                         });
+
                         return response.json();
+
                     })
                     .then(data => {
+
                         parking.innerHTML = "Server not found.";
-                        // document.getElementById('messages').value = data.messages;
+
                     })
                     .catch(function(error) {
+
                         if (error.length > 0) {
                             parking.innerHTML = "Server not found: " + error;
                             parking.className = "error-class";
                         }
-                        // document.getElementById('messages').value = error;
+
                     });
             }
             httpGet();
 
+            // Set the status of a particular parking spot in the server-side that the admin can change from the UI by sending a GET request
             function setParkingStatus(coordinates, value) {
                 const url = "http://192.168.0.203:8080/setParking?coordinates=" + coordinates + "&status=" + value;
                 const headers = {};
