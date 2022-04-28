@@ -1,14 +1,13 @@
-Parker is an automatic Smart Parking Assistant (SPA) that will completely handle the working of a
-parking lot.
+Parker is an automatic Smart Parking Assistant (SPA) that will completely handle the working of a parking lot.
+
 It has the following features:
-● Customized user login
-● Handle a parking lot of 404 spots with sensors
-● Obtain nearest available parking
-● Guide the user to the assigned parking
-● Add payment cards and ease payments without any human intervention
-Sensors: For the 404 parkings, Parker will be using an array of 404 proximity sensors and those sensors
-will detect if there is any car parked in the parking or not.
-Using this information, the server fetch the nearest available parking using BFS in the grid.
+* Customized user login
+* Handle a parking lot of 404 spots with sensors
+* Obtain nearest available parking
+* Guide the user to the assigned parking
+* Add payment cards and ease payments without any human intervention
+
+Sensors: For the 404 parkings, Parker will be using an array of 404 proximity sensors and those sensors will detect if there is any car parked in the parking or not. Using this information, the server fetch the nearest available parking using BFS in the grid.
 
 <----------------------------------installation instructions--------------------------------->
 
