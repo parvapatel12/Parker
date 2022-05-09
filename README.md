@@ -37,4 +37,4 @@ https://drive.google.com/file/d/1uTkEF732RiZGHEqUcJna2em0vkB9Px-W/view
 
 #### Contribution:
 
-* For contribution and there contribution see documentation.
+* For contributers and there contribution see documentation.
