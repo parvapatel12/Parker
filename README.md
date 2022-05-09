@@ -31,3 +31,10 @@ Sensors: For the 404 parkings, Parker will be using an array of 404 proximity se
 * Run the app.
 * The app will be built and get installed automatically if everything is correct.
 > While running for the first time, `Gradle task 'assembleDebug'...` might take a little time. 
+
+#### Link to demo video :
+https://drive.google.com/file/d/1uTkEF732RiZGHEqUcJna2em0vkB9Px-W/view
+
+#### Contribution:
+
+* For contribution and there contribution see documentation.
